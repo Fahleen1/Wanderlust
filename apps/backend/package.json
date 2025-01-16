@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "pnpm with-env ts-node src/index.ts",
+    "dev": "pnpm with-env tsx src/index.ts",
+    "initDb": "pnpm with-env tsx ./src/scripts/initdb.ts",
     "with-env": "dotenv -e ../../.env"
   },
   "keywords": [],
