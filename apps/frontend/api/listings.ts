@@ -5,3 +5,8 @@ export const getListings = async () => {
   console.log('Response:', response);
   return response.data;
 };
+
+export const getListing = async (id: string) => {
+  const response = await axios.get(`/api/listing/${id}`);
+  return response.data;
+};

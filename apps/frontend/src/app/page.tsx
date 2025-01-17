@@ -2,11 +2,14 @@
 
 import { getListings } from '../../api/listings';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useQuery } from 'react-query';
 
 import { Listings } from './types/listings';
 
 export default function Page() {
+  const router = useRouter();
+
   const {
     data: listings = [],
     isError,
@@ -29,6 +32,10 @@ export default function Page() {
     );
   }
 
+  const seeFullInfo = async (id: string) => {
+    router.push(`/listing/${id}`);
+  };
+
   return (
     <div className="container px-2 py-10 sm:mx-auto">
       <div className="flex flex-wrap w-full mb-5">
@@ -43,7 +50,11 @@ export default function Page() {
       {/* Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {listings.map((list) => (
-          <div key={list._id} className="bg-gray-100 p-2 rounded-lg">
+          <div
+            key={list._id}
+            className="bg-gray-100 p-2 rounded-lg"
+            onClick={() => seeFullInfo(list._id)}
+          >
             <Image
               src={list.image.url}
               alt={list.image.filename}

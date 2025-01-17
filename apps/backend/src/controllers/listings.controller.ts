@@ -1,4 +1,8 @@
-import { getAllListings, getListingById } from '../services/listings.service';
+import {
+  addListings,
+  getAllListings,
+  getListingById,
+} from '../services/listings.service';
 import { NextFunction, Request, Response } from 'express';
 
 export const getAllListing = async (
@@ -27,6 +31,33 @@ export const getListing = async (
     res.status(200).json(listing);
   } catch (err) {
     res.status(500).json({ err: 'Error fetching listing' });
+    next(err);
+  }
+};
+
+export const addListing = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const title = req.body.title;
+    const desc = req.body.description;
+    const image = req.body.image.url;
+    const price = req.body.price;
+    const location = req.body.location;
+    const country = req.body.country;
+    const listing = await addListings(
+      title,
+      desc,
+      image,
+      price,
+      location,
+      country,
+    );
+    res.status(200).json(listing);
+  } catch (err) {
+    res.status(500).json({ err: 'Error adding listing' });
     next(err);
   }
 };
