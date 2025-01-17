@@ -1,2 +1,6 @@
 # Ignore build
 build
+./vscode
+/node_modules
+./dist
+.env
