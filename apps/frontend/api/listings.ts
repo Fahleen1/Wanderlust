@@ -12,7 +12,7 @@ export const getListing = async (id: string) => {
   return response.data;
 };
 
-export const addListing = async (params: Add_Listing) => {
+export const createListing = async (params: Add_Listing) => {
   const response = await axios.post('/api/v1/listings/add', params);
   return response.data;
 };
