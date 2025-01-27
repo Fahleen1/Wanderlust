@@ -2,6 +2,15 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import mongoose, { Schema } from 'mongoose';
 
+export interface IUser {
+  _id: string;
+  fullname: string;
+  username: string;
+  email: string;
+  password: string;
+  refreshToken?: string;
+}
+
 const userSchema = new Schema(
   {
     fullname: {
@@ -67,4 +76,4 @@ userSchema.methods.generateRefreshToken = function () {
   });
 };
 
-export const User = mongoose.model('User', userSchema);
+export const User = mongoose.model<IUser>('User', userSchema);
