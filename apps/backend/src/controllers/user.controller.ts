@@ -2,10 +2,23 @@ import {
   checkExistedUser,
   createUser,
   getUserById,
+  updateUser,
 } from '../services/user.service';
 import { ApiError } from '../utils/ApiError';
 import ApiResponse from '../utils/ApiResponse';
 import { NextFunction, Request, Response } from 'express';
+
+export const generateAccessAndRefreshToken = async (userId: string) => {
+  try {
+    const user = await getUserById(userId);
+    const accessToken = await user?.generateAccessToken();
+    const refreshToken = await user?.generateRefreshToken();
+    user?.save({ validateBeforeSave: false });
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ApiError(500, 'Error generating access & refresh tokens');
+  }
+};
 
 export const registerUser = async (
   req: Request,
@@ -40,6 +53,78 @@ export const registerUser = async (
     return res
       .status(201)
       .json(new ApiResponse(201, createdUser, 'User created successfully'));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    //get user credentials
+    const { username, email, password } = req.body;
+    if (!(username || email))
+      throw new ApiError(400, 'Username or email must be required!');
+
+    //Verify if user exists in db
+    const user = await checkExistedUser(username, email);
+    if (!user) throw new ApiError(404, 'User is not found!');
+
+    //Check password
+    const isPasswordValid = await user.isPasswordCorrect(password);
+    if (!isPasswordValid) return new ApiError(404, 'Invalid password');
+
+    //Check access and refresh tokens
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id,
+    );
+
+    //Login the user
+    const loggedInUser = await getUserById(user._id);
+
+    //set options for cookies
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    //Return response
+    return res
+      .status(200)
+      .cookie('accessToken', accessToken, options)
+      .cookie('refreshToken', refreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          { user: loggedInUser, accessToken, refreshToken },
+          'User logged In successfully',
+        ),
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    await updateUser(req.user?._id);
+    const options = {
+      http: true,
+      secure: true,
+    };
+
+    return res
+      .status(200)
+      .clearCookie('accessToken', options)
+      .clearCookie('refreshToken', options)
+      .json(new ApiResponse(200, {}, 'Logout successfully'));
   } catch (error) {
     next(error);
   }

@@ -1,4 +1,4 @@
-import { IUser, User } from '../models/user.model';
+import { User } from '../models/user.model';
 
 export const getUserById = async (id: string) => {
   const user = await User.findById(id).select('-password -refreshToken');
@@ -17,5 +17,14 @@ export const createUser = async (
   password: string,
 ) => {
   const user = await User.create({ fullname, username, email, password });
+  return user;
+};
+
+export const updateUser = async (id: string) => {
+  const user = await User.findByIdAndUpdate(
+    id,
+    { $set: { refreshToken: undefined } },
+    { new: true },
+  );
   return user;
 };

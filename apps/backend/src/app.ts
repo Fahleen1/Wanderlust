@@ -8,6 +8,14 @@ import userroute from './routes/user.route';
 
 export const app: Express = express();
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
 //Middlewares
 app.use(
   cors({

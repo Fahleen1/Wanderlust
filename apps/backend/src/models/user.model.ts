@@ -9,6 +9,9 @@ export interface IUser {
   email: string;
   password: string;
   refreshToken?: string;
+  isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
 }
 
 const userSchema = new Schema(
@@ -74,6 +77,10 @@ userSchema.methods.generateRefreshToken = function () {
   return jwt.sign({ _id: this._id }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: '10d',
   });
+};
+
+userSchema.methods.isPasswordCorrect = async function (password: string) {
+  return await bcrypt.compare(password, this.password);
 };
 
 export const User = mongoose.model<IUser>('User', userSchema);
