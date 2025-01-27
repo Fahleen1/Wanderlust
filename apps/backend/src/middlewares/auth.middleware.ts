@@ -15,7 +15,7 @@ export const verifyJwt = async (
 
     if (!token) throw new ApiError(401, 'Unauthorized');
     if (!process.env.ACCESS_TOKEN_SECRET) {
-      throw new ApiError(500, 'Internal Server Error');
+      throw new ApiError(500, 'Error getting access token from env');
     }
     const decodedToken = jwt.verify(
       token,

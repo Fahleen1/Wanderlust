@@ -1,6 +1,7 @@
 import {
   loginUser,
   logoutUser,
+  refreshAccessToken,
   registerUser,
 } from '../controllers/user.controller';
 import { verifyJwt } from '../middlewares/auth.middleware';
@@ -9,10 +10,11 @@ import express from 'express';
 
 const router = express.Router();
 
-router.post('/user/register', asyncHandler(registerUser));
-router.get('/user/login', asyncHandler(loginUser));
+router.post('/register', asyncHandler(registerUser));
+router.get('/login', asyncHandler(loginUser));
 
 //Protected routes
-router.post('/user/logout', verifyJwt, asyncHandler(logoutUser));
+router.post('/logout', verifyJwt, asyncHandler(logoutUser));
+router.post('/refreshToken', asyncHandler(refreshAccessToken));
 
 export default router;

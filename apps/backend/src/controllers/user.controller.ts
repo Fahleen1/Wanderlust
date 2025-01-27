@@ -7,6 +7,7 @@ import {
 import { ApiError } from '../utils/ApiError';
 import ApiResponse from '../utils/ApiResponse';
 import { NextFunction, Request, Response } from 'express';
+import jwt, { Jwt } from 'jsonwebtoken';
 
 export const generateAccessAndRefreshToken = async (userId: string) => {
   try {
@@ -127,5 +128,59 @@ export const logoutUser = async (
       .json(new ApiResponse(200, {}, 'Logout successfully'));
   } catch (error) {
     next(error);
+  }
+};
+
+export const refreshAccessToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const incomingRefreshToken =
+      req.cookies.refreshToken || req.body.refreshToken;
+    if (!incomingRefreshToken) throw new ApiError(401, 'Unauthorized');
+
+    if (!process.env.REFRESH_TOKEN_SECRET) {
+      throw new ApiError(500, 'Error getting refresh token from env');
+    }
+
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+    ) as jwt.JwtPayload;
+    const user = await getUserById(decodedToken?._id);
+
+    if (!user) {
+      throw new ApiError(401, 'Invalid refresh token');
+    }
+
+    //Validate refresh token
+    if (incomingRefreshToken !== user?.refreshToken) {
+      throw new ApiError(401, 'Refresh token is expired');
+    }
+
+    //Generate new token
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id,
+    );
+    return res
+      .status(200)
+      .cookie('accessToken', accessToken, options)
+      .cookie('refreshToken', refreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          { accessToken, refreshToken },
+          'Access token refreshed successfully',
+        ),
+      );
+  } catch (error) {
+    throw new ApiError(401, (error as Error)?.message);
   }
 };
