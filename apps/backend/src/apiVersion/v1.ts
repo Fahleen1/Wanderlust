@@ -1,1 +1,1 @@
-import express from 'express';
+export const prefix = '/api/v1';
