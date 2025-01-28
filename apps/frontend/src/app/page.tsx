@@ -56,8 +56,8 @@ export default function Page() {
             onClick={() => seeFullInfo(list._id)}
           >
             <Image
-              src={list.image.url}
-              alt={list.image.filename}
+              src={list.image?.url}
+              alt={list.image?.filename || 'No image available'}
               width={300}
               height={300}
               className="w-full h-72 sm:h-64 rounded-lg overflow-hidden"

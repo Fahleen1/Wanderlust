@@ -1,31 +1,45 @@
 'use client';
 
-import { createListing } from '../../../../api/listings';
+import { editListing, getListing } from '../../../../api/listings';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
-import { toast } from 'sonner';
+import { useMutation, useQuery } from 'react-query';
 import { z } from 'zod';
 
-// Validation schema
-export const listingSchema = z.object({
-  title: z.string().min(1, { message: 'Title is required' }),
-  image: z.object({
-    url: z.string().min(1, { message: 'Image URL is required' }),
-  }),
-  location: z.string().min(1, { message: 'Location is required' }),
-  country: z.string().min(1, { message: 'Country is required' }),
-  price: z
-    .number({ invalid_type_error: 'Price must be a number' })
-    .min(1, { message: 'Price is required' }),
-  description: z.string().min(1, { message: 'Description is required' }),
-});
+import { listingSchema } from './AddListing';
 
-export default function AddListing() {
+export default function EditListing({ id }: { id: string }) {
   const router = useRouter();
-  const form = useForm<z.infer<typeof listingSchema>>({
+
+  // Fetch the listing data
+  const {
+    data: listing,
+    isError,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['listing', id],
+    queryFn: async () => await getListing(id),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (data: z.infer<typeof listingSchema>) => editListing(id, data),
+    onSuccess: () => {
+      router.push('/');
+    },
+    onError: (err: { message: string }) => {
+      console.error('Update failed:', err);
+    },
+  });
+
+  const {
+    register,
+    reset,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<z.infer<typeof listingSchema>>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
       title: '',
@@ -38,36 +52,51 @@ export default function AddListing() {
     },
   });
 
-  const { handleSubmit, register, formState } = form;
-  const { errors } = formState;
+  // Use useEffect to reset form when data is fetched
+  useEffect(() => {
+    if (listing) {
+      reset({
+        title: listing.title || '',
+        image: { url: listing.image?.url || '' },
+        location: listing.location || '',
+        country: listing.country || '',
+        description: listing.description || '',
+        price: listing.price || 0,
+      });
+    }
+  }, [listing, reset]);
 
-  const addListing = useMutation({
-    mutationFn: async (data: z.infer<typeof listingSchema>) =>
-      createListing(data),
-    onSuccess: () => {
-      toast.success('Listing added successfully');
-      form.reset();
-      router.push('/');
-    },
-    onError: (error: { message: string }) => {
-      toast.error(error.message);
-    },
-  });
-
-  const onSubmit = (values: z.infer<typeof listingSchema>) => {
-    addListing.mutate(values);
+  // Form submit handler
+  const onSubmit = async (data: z.infer<typeof listingSchema>) => {
+    mutation.mutate(data);
   };
+
+  if (isLoading) {
+    return <span>Loading...</span>;
+  }
+
+  if (isError) {
+    return (
+      <span>
+        Error: {error instanceof Error ? error.message : 'Unknown error'}
+      </span>
+    );
+  }
+
+  if (!listing) {
+    return <span>No listing found</span>;
+  }
 
   return (
     <div className="h-screen w-full max-w-md mx-auto p-2">
       <h1 className="text-center text-3xl m-4 text-gray-600 font-semibold">
-        Add a listing
+        Edit Listing
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="relative mb-6">
           <label className="flex gap-1 items-center mb-2 text-gray-600 text-sm font-medium">
             Title
-            <Image src="/icons/required.svg" alt="svg" width={8} height={8} />
+            <span className="text-red-500">*</span>
           </label>
           <input
             {...register('title')}
@@ -83,7 +112,7 @@ export default function AddListing() {
         <div className="relative mb-6">
           <label className="flex gap-1 items-center mb-2 text-gray-600 text-sm font-medium">
             Image URL
-            <Image src="/icons/required.svg" alt="svg" width={8} height={8} />
+            <span className="text-red-500">*</span>
           </label>
           <input
             {...register('image.url')}
@@ -98,10 +127,11 @@ export default function AddListing() {
           )}
         </div>
 
+        {/* Rest of the form fields - replacing Image with span for required indicator */}
         <div className="relative mb-6">
           <label className="flex gap-1 items-center mb-2 text-gray-600 text-sm font-medium">
             Location
-            <Image src="/icons/required.svg" alt="svg" width={8} height={8} />
+            <span className="text-red-500">*</span>
           </label>
           <input
             {...register('location')}
@@ -119,7 +149,7 @@ export default function AddListing() {
         <div className="relative mb-6">
           <label className="flex gap-1 items-center mb-2 text-gray-600 text-sm font-medium">
             Country
-            <Image src="/icons/required.svg" alt="svg" width={8} height={8} />
+            <span className="text-red-500">*</span>
           </label>
           <input
             {...register('country')}
@@ -137,7 +167,7 @@ export default function AddListing() {
         <div className="relative mb-6">
           <label className="flex gap-1 items-center mb-2 text-gray-600 text-sm font-medium">
             Price
-            <Image src="/icons/required.svg" alt="svg" width={8} height={8} />
+            <span className="text-red-500">*</span>
           </label>
           <input
             {...register('price', { valueAsNumber: true })}
@@ -153,7 +183,7 @@ export default function AddListing() {
         <div className="relative mb-6">
           <label className="flex gap-1 items-center mb-2 text-gray-600 text-sm font-medium">
             Description
-            <Image src="/icons/required.svg" alt="svg" width={8} height={8} />
+            <span className="text-red-500">*</span>
           </label>
           <textarea
             {...register('description')}
@@ -170,8 +200,9 @@ export default function AddListing() {
         <button
           type="submit"
           className="w-full h-12 bg-purple-600 hover:bg-purple-800 rounded-full shadow-xs text-white text-base font-semibold leading-6"
+          disabled={mutation.isLoading}
         >
-          Add
+          {mutation.isLoading ? 'Updating...' : 'Update'}
         </button>
       </form>
     </div>

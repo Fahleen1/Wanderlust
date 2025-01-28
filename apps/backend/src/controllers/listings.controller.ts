@@ -72,12 +72,17 @@ export const updateListing = async (
 ) => {
   try {
     const { id } = req.params;
-    const { title, description, imageUrl, price, country, location } = req.body;
+    const title = req.body.title;
+    const desc = req.body.description;
+    const image = req.body.image.url;
+    const price = req.body.price;
+    const location = req.body.location;
+    const country = req.body.country;
     const updatedListing = await editListing(
       id,
       title,
-      description,
-      imageUrl,
+      desc,
+      image,
       price,
       country,
       location,
