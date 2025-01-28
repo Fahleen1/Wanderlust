@@ -1,8 +1,11 @@
 import {
   addListings,
+  deleteListing,
+  editListing,
   getAllListings,
   getListingById,
 } from '../services/listings.service';
+import ApiResponse from '../utils/ApiResponse';
 import { NextFunction, Request, Response } from 'express';
 
 export const getAllListing = async (
@@ -59,5 +62,48 @@ export const addListing = async (
   } catch (err) {
     res.status(500).json({ err: 'Error adding listing' });
     next(err);
+  }
+};
+
+export const updateListing = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const { title, description, imageUrl, price, country, location } = req.body;
+    const updatedListing = await editListing(
+      id,
+      title,
+      description,
+      imageUrl,
+      price,
+      country,
+      location,
+    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, updatedListing, 'Listing updated successfully'),
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeListing = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    await deleteListing(id);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, 'Listing deleted successfully'));
+  } catch (error) {
+    next(error);
   }
 };

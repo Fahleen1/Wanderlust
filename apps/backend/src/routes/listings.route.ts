@@ -2,13 +2,18 @@ import {
   addListing,
   getAllListing,
   getListing,
+  removeListing,
+  updateListing,
 } from '../controllers/listings.controller';
+import { asyncHandler } from '../utils/asyncHandler';
 import express from 'express';
 
 const router = express.Router();
 
-router.get('/listings', getAllListing);
+router.get('/', getAllListing);
 router.get('/listing/:id', getListing);
 
-router.post('/listings/add', addListing);
+router.post('/add', addListing);
+router.put('/edit/:id', asyncHandler(updateListing));
+router.delete('/:id', asyncHandler(removeListing));
 export default router;

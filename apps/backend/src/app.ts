@@ -28,5 +28,5 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 //Routes
-app.use(`${prefix}`, listingroute);
+app.use(`${prefix}listings`, listingroute);
 app.use(`${prefix}user`, userroute);

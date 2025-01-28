@@ -7,7 +7,7 @@ import {
 import { ApiError } from '../utils/ApiError';
 import ApiResponse from '../utils/ApiResponse';
 import { NextFunction, Request, Response } from 'express';
-import jwt, { Jwt } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export const generateAccessAndRefreshToken = async (userId: string) => {
   try {
