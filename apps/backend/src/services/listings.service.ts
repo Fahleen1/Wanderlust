@@ -31,3 +31,34 @@ export const addListings = async (
 
   return newListing;
 };
+
+export const editListing = async (
+  id: string,
+  title: string,
+  desc: string,
+  imageUrl: string,
+  price: number,
+  location: string,
+  country: string,
+) => {
+  const updatedListing = await Listings.findByIdAndUpdate(
+    id,
+    {
+      title,
+      description: desc,
+      image: { url: imageUrl },
+      price,
+      location,
+      country,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  return updatedListing;
+};
+
+export const deleteListing = async (id: string) => {
+  const listing = await Listings.findByIdAndDelete(id);
+};
