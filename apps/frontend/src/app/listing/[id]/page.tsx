@@ -1,4 +1,4 @@
-import Listing from '../Listing';
+import Listing from '../components/Listing';
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { id } = await params;
