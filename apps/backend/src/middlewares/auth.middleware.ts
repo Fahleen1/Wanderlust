@@ -17,15 +17,18 @@ export const verifyJwt = async (
     if (!process.env.ACCESS_TOKEN_SECRET) {
       throw new ApiError(500, 'Error getting access token from env');
     }
+
     const decodedToken = jwt.verify(
       token,
       process.env.ACCESS_TOKEN_SECRET,
     ) as jwt.JwtPayload;
-    const user = getUserById(decodedToken?._id);
+
+    const user = await getUserById(decodedToken?._id);
     if (!user) throw new ApiError(401, 'User not found');
+
     req.user = user;
     next();
   } catch (error) {
-    throw new ApiError(401, (error as Error)?.message);
+    next(new ApiError(401, (error as Error)?.message));
   }
 };

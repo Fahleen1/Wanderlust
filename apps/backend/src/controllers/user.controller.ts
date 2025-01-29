@@ -181,6 +181,6 @@ export const refreshAccessToken = async (
         ),
       );
   } catch (error) {
-    throw new ApiError(401, (error as Error)?.message);
+    next(error);
   }
 };
