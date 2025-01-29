@@ -6,10 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "pnpm with-env tsx src/index.ts || true",
+    "dev": "nodemon --exec pnpm with-env tsx src/index.ts",
     "initDb": "pnpm with-env tsx ./src/scripts/initdb.ts",
-    "with-env": "dotenv -e ../../.env",
-    "start": "pnpm dev"
+    "with-env": "dotenv -e ../../.env"
   },
   "keywords": [],
   "author": "",

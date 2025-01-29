@@ -15,6 +15,6 @@ router.get('/', getAllListing);
 router.get('/listing/:id', getListing);
 
 router.post('/add', verifyJwt, asyncHandler(addListing));
-router.put('/edit/:id', asyncHandler(updateListing));
-router.delete('/:id', asyncHandler(removeListing));
+router.put('/edit/:id', verifyJwt, asyncHandler(updateListing));
+router.delete('/:id', verifyJwt, asyncHandler(removeListing));
 export default router;
