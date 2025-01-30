@@ -11,7 +11,7 @@ import express from 'express';
 const router = express.Router();
 
 router.post('/register', asyncHandler(registerUser));
-router.get('/login', asyncHandler(loginUser));
+router.post('/login', asyncHandler(loginUser));
 
 //Protected routes
 router.post('/logout', verifyJwt, asyncHandler(logoutUser));

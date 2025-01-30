@@ -1,5 +1,7 @@
 'use client';
 
+import { signIn } from 'next-auth/react';
+
 //import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
@@ -7,6 +9,7 @@ export default function SignIn() {
   //   const handleSubmit = async()=>{
 
   //   }
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       <div className="lg:w-1/2 bg-gray-100 lg:flex hidden items-center justify-center p-6"></div>
@@ -14,7 +17,13 @@ export default function SignIn() {
       <div className="w-full lg:w-1/2 bg-white flex items-center justify-center min-h-screen lg:min-h-full p-4 sm:p-6 md:p-8">
         <div className="w-full max-w-md lg:bg-gray-100 rounded-lg lg:shadow-md p-6 sm:p-8">
           <h2 className="text-2xl font-semibold text-gray-700 mb-6">Sign In</h2>
-          <form>
+          <form
+            action={async (formData) => {
+              'use server';
+              const formDataObj = Object.fromEntries(formData.entries());
+              await signIn('credentials', formDataObj);
+            }}
+          >
             <div className="mb-4">
               <input
                 type="email"
