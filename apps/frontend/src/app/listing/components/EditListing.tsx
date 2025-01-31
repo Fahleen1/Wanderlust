@@ -1,6 +1,6 @@
 'use client';
 
-import { editListing, getListing } from '../../../../api/listings';
+import { editListing, getListing } from '../../../../services/listings';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';

@@ -1,9 +1,10 @@
-import AppBar from './AppBar';
+//import SignIn from './components/SignIn';
 
 export default function Page() {
   return (
     <>
-      <AppBar />
+      <h1>Hello</h1>
+      {/* <SignIn /> */}
     </>
   );
 }

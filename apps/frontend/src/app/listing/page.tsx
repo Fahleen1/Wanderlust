@@ -1,6 +1,6 @@
 'use client';
 
-import { getListings } from '../../../api/listings';
+import { getListings } from '../../../services/listings';
 import { Listings } from '../types/listings';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
