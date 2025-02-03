@@ -1,7 +1,9 @@
-// import { loginUser } from '../../../../../api/user';
-// import NextAuth, { NextAuthOptions } from 'next-auth';
+// import { loginUser } from '../../../../../services/user';
+// import type { NextAuthOptions, User } from 'next-auth';
+// import { Session } from 'next-auth';
+// import { JWT } from 'next-auth/jwt';
 // import Credentials from 'next-auth/providers/credentials';
-// export const authOptions: NextAuthOptions = NextAuth({
+// export const authOptions: NextAuthOptions = {
 //   providers: [
 //     Credentials({
 //       credentials: {
@@ -9,31 +11,23 @@
 //         password: { label: 'Password', type: 'password' },
 //       },
 //       async authorize(credentials) {
-//         // const response = await fetch(request);
-//         // if (!response.ok) return null;
-//         // return (await response.json()) ?? null;
 //         if (!credentials?.email || !credentials?.password) {
 //           throw new Error('Missing credentials');
 //         }
 //         const user = await loginUser(
-//           credentials?.email as string,
-//           credentials?.password as string,
+//           credentials.email as string,
+//           credentials.password as string,
 //         );
 //         console.log(user);
 //         if (!user || !user.token) {
 //           throw new Error('Invalid credentials');
 //         }
 //         return user;
-//         // return {
-//         //   id: user._id,
-//         //   email: user.email,
-//         //   token: user.token,
-//         // };
 //       },
 //     }),
 //   ],
 //   callbacks: {
-//     async session({ session, token }) {
+//     async session({ session, token }: { session: Session; token: JWT }) {
 //       if (token) {
 //         session.user._id = token._id;
 //         session.user.isVerified = token.isVerified;
@@ -41,7 +35,7 @@
 //       }
 //       return session;
 //     },
-//     async jwt({ token, user }) {
+//     async jwt({ token, user }: { token: JWT; user: User }) {
 //       if (user) {
 //         token._id = user._id?.toString();
 //         token.isVerified = user.isVerified;
@@ -57,29 +51,41 @@
 //     strategy: 'jwt',
 //   },
 //   secret: process.env.NEXTAUTH_SECRET,
-// });
+// };
 import { loginUser } from '../../../../../services/user';
-import { NextAuthOptions } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
+import Credentials from '@auth/core/providers/credentials';
+import type { AuthConfig } from '@auth/core/types';
 
-export const authOptions: NextAuthOptions = {
+export const authConfig: AuthConfig = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Credentials({
       credentials: {
         email: { label: 'Email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      authorize: async (credentials) => {
+        // const res = await fetch('http://localhost:5000/api/auth/login', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(credentials),
+        // });
+
+        // const user = await res.json();
+        // if (res.ok && user) return user;
+        // return null;
+
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Missing credentials');
         }
-
-        const user = await loginUser(credentials.email, credentials.password);
-
+        const user = await loginUser(
+          credentials.email as string,
+          credentials.password as string,
+        );
+        console.log(user);
         if (!user || !user.token) {
           throw new Error('Invalid credentials');
         }
-
         return user;
       },
     }),
@@ -102,11 +108,5 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
-  pages: {
-    signIn: '/signin',
-  },
-  session: {
-    strategy: 'jwt',
-  },
-  secret: process.env.NEXTAUTH_SECRET,
+  session: { strategy: 'jwt' },
 };

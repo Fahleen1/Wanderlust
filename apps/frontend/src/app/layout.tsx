@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import AuthProvider from './Providers/authProvider';
 import Providers from './Providers/queryClient';
 import './globals.css';
 
@@ -25,17 +24,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  //const session = await auth();
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <Providers>
-            <main className="h-screen"> {children}</main>
-          </Providers>
-        </AuthProvider>
+        <Providers>
+          <main className="h-screen"> {children}</main>
+        </Providers>
       </body>
     </html>
   );

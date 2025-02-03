@@ -79,6 +79,12 @@ importers:
 
   apps/frontend:
     dependencies:
+      '@auth/core':
+        specifier: ^0.37.4
+        version: 0.37.4(nodemailer@6.10.0)
+      '@auth/nextjs':
+        specifier: 0.0.0-380f8d56
+        version: 0.0.0-380f8d56(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.0)
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.54.2(react@19.0.0))
@@ -91,9 +97,6 @@ importers:
       next:
         specifier: 15.1.4
         version: 15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      next-auth:
-        specifier: 5.0.0-beta.25
-        version: 5.0.0-beta.25(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.0)(react@19.0.0)
       nodemailer:
         specifier: ^6.10.0
         version: 6.10.0
@@ -156,8 +159,16 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
-  '@auth/core@0.37.2':
-    resolution: {integrity: sha512-kUvzyvkcd6h1vpeMAojK2y7+PAV5H+0Cc9+ZlKYDFhDY31AlvsB+GW5vNO4qE3Y07KeQgvNO9U0QUx/fN62kBw==}
+  '@auth/core@0.0.0-380f8d56':
+    resolution: {integrity: sha512-V3nVwrFE6PRTkNv7QVBeiwIYuJ7EgTeQDyUslPQvYTvlwwwpfsp1M7fUFGP0ZVQVfR/BkdqRcTFM3Te2/Nuzjw==}
+    peerDependencies:
+      nodemailer: ^6.8.0
+    peerDependenciesMeta:
+      nodemailer:
+        optional: true
+
+  '@auth/core@0.37.4':
+    resolution: {integrity: sha512-HOXJwXWXQRhbBDHlMU0K/6FT1v+wjtzdKhsNg0ZN7/gne6XPsIrjZ4daMcFnbq0Z/vsAbYBinQhhua0d77v7qw==}
     peerDependencies:
       '@simplewebauthn/browser': ^9.0.1
       '@simplewebauthn/server': ^9.0.2
@@ -169,6 +180,11 @@ packages:
         optional: true
       nodemailer:
         optional: true
+
+  '@auth/nextjs@0.0.0-380f8d56':
+    resolution: {integrity: sha512-5fNAu5BENcoaYh+U/YI3Qs93ZZjL//++P5OSp4aCr5/jF42hZL5ZfbLRoYiq763h4mfQWAE6DElEHUtewkYoBA==}
+    peerDependencies:
+      next: ^13.3.0
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -537,9 +553,6 @@ packages:
     peerDependencies:
       '@types/express': '*'
 
-  '@types/cookie@0.6.0':
-    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
-
   '@types/cors@2.8.17':
     resolution: {integrity: sha512-8CGDvrBj1zgo2qE+oS3pOCyYNqCPryMWY2bGfwA0dcfopWGgxs+78df0Rs3rc9THP4JkOhLsAa+15VdpAqkcUA==}
 
@@ -881,6 +894,10 @@ packages:
 
   cookie-signature@1.0.6:
     resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
+
+  cookie@0.5.0:
+    resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
+    engines: {node: '>= 0.6'}
 
   cookie@0.7.1:
     resolution: {integrity: sha512-6DnInpx7SJ2AK3+CTUE/ZM0vWTUboZCegxhC2xiIydHR9jNuTAASBrfEpHhiGOZw/nX51bHt6YQl8jsGo4y/0w==}
@@ -1539,6 +1556,9 @@ packages:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
 
+  jose@4.15.9:
+    resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
+
   jose@5.9.6:
     resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
 
@@ -1775,22 +1795,6 @@ packages:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
 
-  next-auth@5.0.0-beta.25:
-    resolution: {integrity: sha512-2dJJw1sHQl2qxCrRk+KTQbeH+izFbGFPuJj5eGgBZFYyiYYtvlrBeUw1E/OJJxTRjuxbSYGnCTkUIRsIIW0bog==}
-    peerDependencies:
-      '@simplewebauthn/browser': ^9.0.1
-      '@simplewebauthn/server': ^9.0.2
-      next: ^14.0.0-0 || ^15.0.0-0
-      nodemailer: ^6.6.5
-      react: ^18.2.0 || ^19.0.0-0
-    peerDependenciesMeta:
-      '@simplewebauthn/browser':
-        optional: true
-      '@simplewebauthn/server':
-        optional: true
-      nodemailer:
-        optional: true
-
   next@15.1.4:
     resolution: {integrity: sha512-mTaq9dwaSuwwOrcu3ebjDYObekkxRnXpuVL21zotM8qE2W0HBOdVIdg2Li9QjMEZrj73LN96LcWcz62V19FjAg==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
@@ -1824,6 +1828,9 @@ packages:
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
+
+  oauth4webapi@2.17.0:
+    resolution: {integrity: sha512-lbC0Z7uzAFNFyzEYRIC+pkSVvDHJTbEW+dYlSBAlCYDe6RxUkJ26bClhk8ocBZip1wfI9uKTe0fm4Ib4RHn6uQ==}
 
   oauth4webapi@3.1.4:
     resolution: {integrity: sha512-eVfN3nZNbok2s/ROifO0UAc5G8nRoLSbrcKJ09OqmucgnhXEfdIQOR4gq1eJH1rN3gV7rNw62bDEgftsgFtBEg==}
@@ -1997,8 +2004,16 @@ packages:
     peerDependencies:
       preact: '>=10'
 
+  preact-render-to-string@6.5.11:
+    resolution: {integrity: sha512-ubnauqoGczeGISiOh6RjX0/cdaF8v/oDXIjO85XALCQjwQP+SB4RDXXtvZ6yTYSjG+PC1QRP2AhPgCEsM2EvUw==}
+    peerDependencies:
+      preact: '>=10'
+
   preact@10.11.3:
     resolution: {integrity: sha512-eY93IVpod/zG3uMF22Unl8h9KkrcKIRs2EGar8hwLZZDU1lkjph303V9HZBwufh2s736U6VXuhD109LYqPoffg==}
+
+  preact@10.24.3:
+    resolution: {integrity: sha512-Z2dPnBnMUfyQfSQ+GBdsGa16hz35YmLmtTLhM169uW944hYL6xzTYkJjC07j+Wosz733pMWx0fgON3JNw1jJQA==}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -2507,17 +2522,33 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
-  '@auth/core@0.37.2(nodemailer@6.10.0)':
+  '@auth/core@0.0.0-380f8d56(nodemailer@6.10.0)':
     dependencies:
       '@panva/hkdf': 1.2.1
-      '@types/cookie': 0.6.0
-      cookie: 0.7.1
-      jose: 5.9.6
-      oauth4webapi: 3.1.4
+      cookie: 0.5.0
+      jose: 4.15.9
+      oauth4webapi: 2.17.0
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
     optionalDependencies:
       nodemailer: 6.10.0
+
+  '@auth/core@0.37.4(nodemailer@6.10.0)':
+    dependencies:
+      '@panva/hkdf': 1.2.1
+      jose: 5.9.6
+      oauth4webapi: 3.1.4
+      preact: 10.24.3
+      preact-render-to-string: 6.5.11(preact@10.24.3)
+    optionalDependencies:
+      nodemailer: 6.10.0
+
+  '@auth/nextjs@0.0.0-380f8d56(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.0)':
+    dependencies:
+      '@auth/core': 0.0.0-380f8d56(nodemailer@6.10.0)
+      next: 15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+    transitivePeerDependencies:
+      - nodemailer
 
   '@babel/code-frame@7.26.2':
     dependencies:
@@ -2839,8 +2870,6 @@ snapshots:
   '@types/cookie-parser@1.4.8(@types/express@5.0.0)':
     dependencies:
       '@types/express': 5.0.0
-
-  '@types/cookie@0.6.0': {}
 
   '@types/cors@2.8.17':
     dependencies:
@@ -3263,6 +3292,8 @@ snapshots:
       cookie-signature: 1.0.6
 
   cookie-signature@1.0.6: {}
+
+  cookie@0.5.0: {}
 
   cookie@0.7.1: {}
 
@@ -4097,6 +4128,8 @@ snapshots:
 
   jiti@1.21.7: {}
 
+  jose@4.15.9: {}
+
   jose@5.9.6: {}
 
   js-sha3@0.8.0: {}
@@ -4303,14 +4336,6 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  next-auth@5.0.0-beta.25(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.0)(react@19.0.0):
-    dependencies:
-      '@auth/core': 0.37.2(nodemailer@6.10.0)
-      next: 15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      react: 19.0.0
-    optionalDependencies:
-      nodemailer: 6.10.0
-
   next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@next/env': 15.1.4
@@ -4352,6 +4377,8 @@ snapshots:
       undefsafe: 2.0.5
 
   normalize-path@3.0.0: {}
+
+  oauth4webapi@2.17.0: {}
 
   oauth4webapi@3.1.4: {}
 
@@ -4515,7 +4542,13 @@ snapshots:
       preact: 10.11.3
       pretty-format: 3.8.0
 
+  preact-render-to-string@6.5.11(preact@10.24.3):
+    dependencies:
+      preact: 10.24.3
+
   preact@10.11.3: {}
+
+  preact@10.24.3: {}
 
   prelude-ls@1.2.1: {}
 

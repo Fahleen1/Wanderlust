@@ -1,5 +1,8 @@
-//import SignIn from '../components/SignIn';
-
 export default function Page() {
-  return <>{/* <SignIn /> */}</>;
+  return (
+    <>
+      <h1>hi</h1>
+      {/* <SignIn /> */}
+    </>
+  );
 }
