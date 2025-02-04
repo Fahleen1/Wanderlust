@@ -1,27 +1,20 @@
 import axios from 'axios';
 
-// export const loginUser = async (email?: string, password?: string) => {
-//   const response = await axios.post(
-//     `/api/v1/user/login`,
-//     { email, password },
-//     {
-//       withCredentials: true,
-//     },
-//   );
-//   return response.data;
-// };
-
-export const loginUser = async (email: string, password: string) => {
-  console.log('Sending request with:', { email, password });
+export const loginUser = async (
+  username: string,
+  email: string,
+  password: string,
+) => {
+  console.log('Sending request with:', { username, email, password });
 
   try {
     const response = await axios.post(
-      'http://localhost:3001/api/v1/user/login', // <-- Ensure full backend URL
-      { email, password },
+      'http://localhost:3001/api/v1/user/login',
+      { username, email, password },
       { withCredentials: true },
     );
 
-    console.log('Login response:', response.data); // Debugging
+    console.log('Login response:', response.data);
 
     return response.data;
   } catch (error) {

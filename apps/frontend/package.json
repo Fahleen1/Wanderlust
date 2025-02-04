@@ -9,12 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/core": "^0.37.4",
-    "@auth/nextjs": "0.0.0-380f8d56",
     "@hookform/resolvers": "^3.10.0",
+    "@next/env": "^15.1.6",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "next": "15.1.4",
+    "next-auth": "^4.24.11",
     "nodemailer": "^6.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
