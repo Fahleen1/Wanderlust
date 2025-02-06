@@ -186,3 +186,25 @@ export const refreshAccessToken = async (
     next(error);
   }
 };
+
+export const generateAuthTokens = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      throw new ApiError(400, 'User ID is required');
+    }
+    const user = await getUserById(userId);
+    if (!user) {
+      throw new ApiError(404, 'User not found');
+    }
+    const accessToken = await userId.generateAccessToken(userId);
+    const refreshToken = await userId.generateRefreshToken(userId);
+    res.status(200).json({ accessToken, refreshToken });
+  } catch (error) {
+    next(error);
+  }
+};
