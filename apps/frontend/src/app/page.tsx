@@ -1,16 +1,17 @@
 'use client';
 
-import { signIn, signOut } from 'next-auth/react';
-import { useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 export default function AuthButtons() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   console.log(session);
 
+  if (status === 'loading') return <p>Loading...</p>;
+
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center min-h-screen">
       {session ? (
-        <div>
+        <>
           <p>Signed in as {session.user?.email}</p>
           <button
             onClick={() => signOut()}
@@ -18,7 +19,7 @@ export default function AuthButtons() {
           >
             Sign Out
           </button>
-        </div>
+        </>
       ) : (
         <button
           onClick={() => signIn()}

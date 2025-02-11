@@ -2,15 +2,12 @@
 
 import { getListings } from '../../../services/listings';
 import { Listings } from '../types/listings';
-import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQuery } from 'react-query';
 
 export default function Page() {
   const router = useRouter();
-  const { data: session } = useSession();
-  console.log(session);
 
   const {
     data: listings = [],
