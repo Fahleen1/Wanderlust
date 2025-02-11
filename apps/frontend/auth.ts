@@ -19,7 +19,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             credentials.email as string,
             credentials.password as string,
           );
-          console.log('Login response:', response.data.user.username);
 
           if (!response.data) return null;
 
@@ -53,7 +52,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
       }
-      console.log('JWT Token:', token);
 
       return token;
     },
@@ -69,8 +67,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         accessToken: token.accessToken,
         refreshToken: token.refreshToken,
       };
-
-      console.log('Session Data:', session);
 
       return session;
     },
