@@ -12,8 +12,8 @@ import jwt from 'jsonwebtoken';
 export const generateAccessAndRefreshToken = async (userId: string) => {
   try {
     const user = await getUserById(userId);
-    const accessToken = await user?.generateAccessToken();
-    const refreshToken = await user?.generateRefreshToken();
+    const accessToken = user?.generateAccessToken();
+    const refreshToken = user?.generateRefreshToken();
     user?.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
@@ -181,6 +181,28 @@ export const refreshAccessToken = async (
         ),
       );
   } catch (error) {
-    throw new ApiError(401, (error as Error)?.message);
+    next(error);
+  }
+};
+
+export const generateAuthTokens = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      throw new ApiError(400, 'User ID is required');
+    }
+    const user = await getUserById(userId);
+    if (!user) {
+      throw new ApiError(404, 'User not found');
+    }
+    const accessToken = await userId.generateAccessToken(userId);
+    const refreshToken = await userId.generateRefreshToken(userId);
+    res.status(200).json({ accessToken, refreshToken });
+  } catch (error) {
+    next(error);
   }
 };

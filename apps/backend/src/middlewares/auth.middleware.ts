@@ -9,10 +9,10 @@ export const verifyJwt = async (
   next: NextFunction,
 ) => {
   try {
+    console.log('Checking token...');
     const token =
       req.cookies?.accessToken ||
       req.header('Authorization')?.replace('Bearer ', '');
-
     if (!token) throw new ApiError(401, 'Unauthorized');
     if (!process.env.ACCESS_TOKEN_SECRET) {
       throw new ApiError(500, 'Error getting access token from env');
@@ -21,11 +21,11 @@ export const verifyJwt = async (
       token,
       process.env.ACCESS_TOKEN_SECRET,
     ) as jwt.JwtPayload;
-    const user = getUserById(decodedToken?._id);
+    const user = await getUserById(decodedToken?._id);
     if (!user) throw new ApiError(401, 'User not found');
     req.user = user;
     next();
   } catch (error) {
-    throw new ApiError(401, (error as Error)?.message);
+    next(new ApiError(401, (error as Error)?.message));
   }
 };

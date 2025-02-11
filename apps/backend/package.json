@@ -6,10 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "pnpm with-env tsx src/index.ts || true",
+    "dev": "nodemon --exec pnpm with-env tsx src/index.ts",
     "initDb": "pnpm with-env tsx ./src/scripts/initdb.ts",
-    "with-env": "dotenv -e ../../.env",
-    "start": "pnpm dev"
+    "with-env": "dotenv -e ../../.env"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +29,9 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.8",
+    "@types/nodemailer": "^6.4.17",
+    "nodemailer": "^6.10.0",
+    "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   }

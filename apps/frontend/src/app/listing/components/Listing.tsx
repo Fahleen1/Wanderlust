@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteListing, getListing } from '../../../api/listings';
+import { deleteListing, getListing } from '../../../../services/listings';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQuery } from 'react-query';
