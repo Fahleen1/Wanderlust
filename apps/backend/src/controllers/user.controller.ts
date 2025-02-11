@@ -71,9 +71,7 @@ export const loginUser = async (
       throw new ApiError(400, 'Username or email must be required!');
 
     //Verify if user exists in db
-    console.log('Checking user:', { username, email });
     const user = await checkExistedUser(username, email);
-    console.log('DB Lookup Result:', user);
     if (!user) throw new ApiError(404, 'User is not found!');
 
     //Check password
