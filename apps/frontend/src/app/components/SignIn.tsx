@@ -1,10 +1,9 @@
 'use client';
 
-import { loginUser } from '../../../services/user';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -28,24 +27,20 @@ export default function SignIn() {
     },
   });
 
-  // Login Mutation
-  const login = useMutation({
-    mutationFn: async (data: z.infer<typeof userSchema>) =>
-      loginUser(data.username, data.email, data.password),
-
-    onSuccess: () => {
-      toast.success('User signed in successfully');
-      form.reset();
-      router.push('/listing');
-    },
-    onError: (error: { message: string }) => {
-      toast.error(error.message);
-    },
-  });
-
   // Handle form submission
-  const handleSubmit = (values: z.infer<typeof userSchema>) => {
-    login.mutate(values);
+  const handleSubmit = async (values: z.infer<typeof userSchema>) => {
+    const result = await signIn('credentials', {
+      username: values.username,
+      email: values.email,
+      password: values.password,
+    });
+
+    if (result?.error) {
+      toast.error(result.error);
+    } else {
+      toast.success('Signed in successfully');
+      router.push('/listing');
+    }
   };
 
   return (
@@ -97,10 +92,9 @@ export default function SignIn() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full text-white bg-purple-600 hover:bg-purple-800 py-2 px-4 rounded transition duration-200"
-              disabled={login.isLoading}
+              className="w-full bg-purple-600 text-white py-2 rounded"
             >
-              {login.isLoading ? 'Signing in...' : 'Sign In'}
+              Sign In
             </button>
           </form>
 

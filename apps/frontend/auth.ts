@@ -3,6 +3,8 @@ import NextAuth, { User } from 'next-auth';
 import { AdapterUser } from 'next-auth/adapters';
 import Credentials from 'next-auth/providers/credentials';
 
+import { loginUser } from './services/user';
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -14,14 +16,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       async authorize(credentials) {
         try {
-          const response = await axios.post(
-            'http://localhost:3001/api/v1/user/login',
-            {
-              username: credentials.username,
-              email: credentials.email,
-              password: credentials.password,
-            },
-            { withCredentials: true },
+          const response = await loginUser(
+            credentials.username as string,
+            credentials.email as string,
+            credentials.password as string,
           );
           console.log('Login response:', response.data);
 

@@ -1,20 +1,32 @@
-import { auth } from '../../auth';
-import { signIn, signOut } from 'next-auth/react';
+'use client';
 
-export default async function Page() {
-  const session = await auth();
-  console.log('Session from useSession():', session);
-  if (session) {
-    return (
-      <div>
-        <p>Signed in as {session.user.email}</p>
-        <button onClick={() => signOut()}>SignOut</button>
-      </div>
-    );
-  }
+import { signIn, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
+
+export default function AuthButtons() {
+  const { data: session } = useSession();
+  console.log(session);
+
   return (
     <div>
-      <button onClick={() => signIn()}>Sign In</button>
+      {session ? (
+        <div>
+          <p>Signed in as {session.user?.email}</p>
+          <button
+            onClick={() => signOut()}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
+            Sign Out
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => signIn()}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Sign In
+        </button>
+      )}
     </div>
   );
 }
