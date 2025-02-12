@@ -1,78 +1,169 @@
 import axios from 'axios';
-import NextAuth, { Session, User } from 'next-auth';
+import { jwtDecode } from 'jwt-decode';
+import NextAuth, { User } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import Credentials from 'next-auth/providers/credentials';
 
-import { loginUser } from './services/user';
+// Token management functions
+const isTokenExpired = (token: string): boolean => {
+  if (!token) return true;
+  try {
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    if (!decodedToken.exp) return true;
+    return decodedToken.exp < currentTime;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return true;
+  }
+};
 
+const refreshBackendAccessToken = async (token: JWT) => {
+  try {
+    const response = await axios.post(
+      `${process.env.BACKEND_URL}/user/refreshToken`,
+      {
+        refreshToken: token.refreshToken,
+      },
+    );
+
+    if (!response.data?.accessToken) {
+      return { ...token, error: 'RefreshAccessTokenError' };
+    }
+
+    return {
+      accessToken: response.data.accessToken,
+      refreshToken: response.data.refreshToken || token.refreshToken,
+    };
+  } catch {
+    return { ...token, error: 'RefreshAccessTokenError' };
+  }
+};
+
+// Authentication handlers
+const handleCredentialsSignIn = async (user: User) => {
+  console.log('Sending to backend:', user);
+  const response = await axios.post(
+    `http://localhost:3001/api/v1/user/generate-tokens`,
+    {
+      userId: user.id,
+    },
+    { withCredentials: true },
+  );
+  if (response.data?.accessToken && response.data?.refreshToken) {
+    user.accessToken = response.data.accessToken;
+    user.refreshToken = response.data.refreshToken;
+    return true;
+  }
+  return false;
+};
+
+// Token refresh handler
+const handleTokenRefresh = async (token: JWT) => {
+  let updatedToken = { ...token };
+  const accessTokenExpired = token.accessToken
+    ? isTokenExpired(token.accessToken)
+    : true;
+
+  if (accessTokenExpired) {
+    const backendTokenData = await refreshBackendAccessToken(token);
+    updatedToken = { ...token, ...backendTokenData };
+  }
+
+  return updatedToken;
+};
+
+// NextAuth configuration
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
+      type: 'credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        username: { type: 'string', label: 'Email' },
+        password: { type: 'string', label: 'Password' },
       },
-
       async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) return null;
+
         try {
-          const response = await loginUser(
-            credentials.email as string,
-            credentials.password as string,
+          const response = await axios.post(
+            `${process.env.BACKEND_URL}/user/login`,
+            {
+              email: credentials.username,
+              password: credentials.password,
+            },
           );
 
-          if (!response.data) return null;
+          if (response.data?.success && response.data?.data) {
+            const { user, accessToken, refreshToken } = response.data.data;
 
-          return {
-            id: response.data.user._id,
-            username: response.data.user.username,
-            email: response.data.user.email,
-            accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
-          };
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            console.error(
-              'Login failed:',
-              error.response?.data || error.message,
-            );
-          } else {
-            console.error('Login failed:', (error as Error).message);
+            return {
+              id: user._id,
+              username: user.username,
+              email: user.email,
+              accessToken,
+              refreshToken,
+              provider: 'credentials',
+              token: accessToken,
+            };
           }
+          return null;
+        } catch (error) {
+          console.log('error in credentials authorize function', error);
           return null;
         }
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: User }) {
-      if (user) {
-        token.id = user.id as string;
-        token.username = user.username;
-        token.email = user.email as string;
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
+    async signIn({ user, account }) {
+      try {
+        if (account?.provider === 'credentials' && user.token) {
+          return await handleCredentialsSignIn(user);
+        }
+        return false;
+      } catch (error) {
+        console.error('Error during sign-in callback:', error);
+        return false;
       }
-
-      return token;
     },
 
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async jwt({ token, user, account }) {
+      if (user && account) {
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
+        token.provider = account.provider;
+        token.user = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+        };
+        return token;
+      }
+
+      return handleTokenRefresh(token);
+    },
+
+    async session({ session, token }) {
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;
-
+      session.provider = token.provider;
       session.user = {
-        id: token.id,
-        username: token.username,
-        email: token.email,
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken,
+        ...token.user,
+        id: token.user.id ?? '',
+        username: token.user.username,
+        email: token.user.email ?? '',
+        emailVerified: new Date(),
+        token: token.accessToken ?? '',
       };
-
       return session;
     },
   },
-  pages: {
-    signIn: '/signin',
+  // pages: {
+  //   signIn: '/signin',
+  // },
+  session: {
+    strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
 });

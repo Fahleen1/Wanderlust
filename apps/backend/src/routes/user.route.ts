@@ -1,5 +1,4 @@
 import {
-  generateAccessAndRefreshToken,
   generateAuthTokens,
   loginUser,
   logoutUser,
@@ -17,6 +16,6 @@ router.post('/login', asyncHandler(loginUser));
 
 //Protected routes
 router.post('/logout', verifyJwt, asyncHandler(logoutUser));
-router.post('/refreshToken', asyncHandler(refreshAccessToken));
-router.post('/generate-token', asyncHandler(generateAuthTokens));
+router.post('/refreshToken', verifyJwt, asyncHandler(refreshAccessToken));
+router.post('/generate-tokens', asyncHandler(generateAuthTokens));
 export default router;

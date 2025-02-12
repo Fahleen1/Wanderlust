@@ -29,6 +29,11 @@ const listingsSchema = new mongoose.Schema({
   country: {
     type: String,
   },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
 });
 
 export const Listings = mongoose.model('listings', listingsSchema);

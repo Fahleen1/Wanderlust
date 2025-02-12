@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 export const userSchema = z.object({
-  username: z.string(),
   email: z
     .string()
     .min(1, { message: 'Email is required' })
@@ -21,7 +20,6 @@ export default function SignIn() {
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      username: '',
       email: '',
       password: '',
     },
@@ -30,7 +28,6 @@ export default function SignIn() {
   // Handle form submission
   const handleSubmit = async (values: z.infer<typeof userSchema>) => {
     const result = await signIn('credentials', {
-      username: values.username,
       email: values.email,
       password: values.password,
     });

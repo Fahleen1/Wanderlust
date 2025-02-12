@@ -9,12 +9,18 @@ export async function middleware(request: NextRequest) {
   });
 
   const url = request.nextUrl;
+  const pathname = request.nextUrl.pathname;
+  const protectedRoutes = ['/listing/:id/edit', '/listing/add'];
   if (
     token &&
     !url.pathname.startsWith('/api') && // Don't rewrite API requests
     (url.pathname.startsWith('/signin') || url.pathname.startsWith('/signup'))
   ) {
     return NextResponse.rewrite(new URL('/listing', request.url));
+  }
+
+  if (!token && protectedRoutes.includes(pathname)) {
+    return NextResponse.redirect(new URL('/signin', request.url));
   }
 
   return NextResponse.next();
@@ -26,5 +32,6 @@ export const config = {
     '/',
     // Always run for API routes
     '/(api|trpc)(.*)',
+    '/listing/:id/edit',
   ],
 };

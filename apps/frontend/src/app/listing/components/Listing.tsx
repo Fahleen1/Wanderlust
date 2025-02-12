@@ -46,7 +46,7 @@ export default function Listing({ id }: { id: string }) {
 
   const handleDelete = async (id: string) => {
     await deleteListing(id);
-    router.push('/');
+    router.push('/listing');
   };
 
   return (

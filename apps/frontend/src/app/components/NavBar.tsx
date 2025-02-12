@@ -3,10 +3,15 @@
 import { links } from '../items';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function NavBar() {
   const { data: session, status } = useSession();
-
+  const router = useRouter();
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push('/signin');
+  };
   return (
     <div className="bg-gray-800 text-white p-4">
       <nav className="max-w-6xl mx-auto flex justify-between items-center">
@@ -30,7 +35,7 @@ export default function NavBar() {
                 <span className="font-semibold">{session.user?.email}</span>
               </p>
               <button
-                onClick={() => signOut()}
+                onClick={handleSignOut}
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition"
               >
                 Sign Out
@@ -38,7 +43,7 @@ export default function NavBar() {
             </>
           ) : (
             <button
-              onClick={() => signIn()}
+              onClick={() => signIn}
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition"
             >
               Sign In
