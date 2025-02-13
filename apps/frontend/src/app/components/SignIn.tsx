@@ -1,8 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -16,6 +18,7 @@ export const userSchema = z.object({
 });
 
 export default function SignIn() {
+  const [isLoading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -27,11 +30,14 @@ export default function SignIn() {
 
   // Handle form submission
   const handleSubmit = async (values: z.infer<typeof userSchema>) => {
+    setLoading(true);
     const result = await signIn('credentials', {
       email: values.email,
       password: values.password,
+      redirect: true,
     });
 
+    setLoading(false);
     if (result?.error) {
       toast.error(result.error);
     } else {
@@ -53,6 +59,7 @@ export default function SignIn() {
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
+            name="signin-form"
           >
             {/* Email Input */}
             <div>
@@ -60,6 +67,7 @@ export default function SignIn() {
                 type="email"
                 id="email"
                 placeholder="Enter email"
+                autoComplete="email"
                 {...form.register('email')}
                 className="w-full bg-white rounded border border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-gray-700 py-2 px-3 outline-none"
               />
@@ -76,6 +84,7 @@ export default function SignIn() {
                 type="password"
                 id="password"
                 placeholder="Enter password"
+                autoComplete="current-password"
                 {...form.register('password')}
                 className="w-full bg-white rounded border border-gray-300 focus:border-purple-500 focus:ring-purple-500 text-gray-700 py-2 px-3 outline-none"
               />
@@ -91,6 +100,7 @@ export default function SignIn() {
               type="submit"
               className="w-full bg-purple-600 text-white py-2 rounded"
             >
+              {isLoading && <Loader className="animate-spin" />}
               Sign In
             </button>
           </form>

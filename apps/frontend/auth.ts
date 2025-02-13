@@ -42,13 +42,11 @@ const refreshBackendAccessToken = async (token: JWT) => {
 
 // Authentication handlers
 const handleCredentialsSignIn = async (user: User) => {
-  console.log('Sending to backend:', user);
   const response = await axios.post(
     `http://localhost:3001/api/v1/user/generate-tokens`,
     {
       userId: user.id,
     },
-    { withCredentials: true },
   );
   if (response.data?.accessToken && response.data?.refreshToken) {
     user.accessToken = response.data.accessToken;
@@ -79,17 +77,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       type: 'credentials',
       credentials: {
-        username: { type: 'string', label: 'Email' },
+        email: { type: 'string', label: 'Email' },
         password: { type: 'string', label: 'Password' },
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) return null;
+        if (!credentials?.email || !credentials?.password) return null;
 
         try {
           const response = await axios.post(
             `${process.env.BACKEND_URL}/user/login`,
             {
-              email: credentials.username,
+              email: credentials.email,
               password: credentials.password,
             },
           );
@@ -159,9 +157,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-  // pages: {
-  //   signIn: '/signin',
-  // },
+  pages: {
+    signIn: '/signin',
+  },
   session: {
     strategy: 'jwt',
   },

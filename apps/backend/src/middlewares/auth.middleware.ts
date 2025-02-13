@@ -12,6 +12,7 @@ export const verifyJwt = async (
     const token =
       req.cookies?.accessToken ||
       req.header('Authorization')?.replace('Bearer ', '');
+    console.log(token);
     if (!token) throw new ApiError(401, 'Unauthorized');
 
     if (!token) throw new ApiError(401, 'Unauthorized: No token provided');

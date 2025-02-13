@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
 
   const url = request.nextUrl;
   const pathname = request.nextUrl.pathname;
-  const protectedRoutes = ['/listing/:id/edit', '/listing/add'];
+  const protectedRoutes = ['/^\/listing\/[^/]+\/edit$/', '/listing/add'];
   if (
     token &&
     !url.pathname.startsWith('/api') && // Don't rewrite API requests
