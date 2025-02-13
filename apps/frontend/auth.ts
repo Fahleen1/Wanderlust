@@ -1,62 +1,167 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import NextAuth, { User } from 'next-auth';
-import { AdapterUser } from 'next-auth/adapters';
+import { JWT } from 'next-auth/jwt';
 import Credentials from 'next-auth/providers/credentials';
 
-import { loginUser } from './services/user';
+// Token management functions
+const isTokenExpired = (token: string): boolean => {
+  if (!token) return true;
+  try {
+    const decodedToken = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    if (!decodedToken.exp) return true;
+    return decodedToken.exp < currentTime;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return true;
+  }
+};
 
+const refreshBackendAccessToken = async (token: JWT) => {
+  try {
+    const response = await axios.post(
+      `${process.env.BACKEND_URL}/user/refreshToken`,
+      {
+        refreshToken: token.refreshToken,
+      },
+    );
+
+    if (!response.data?.accessToken) {
+      return { ...token, error: 'RefreshAccessTokenError' };
+    }
+
+    return {
+      accessToken: response.data.accessToken,
+      refreshToken: response.data.refreshToken || token.refreshToken,
+    };
+  } catch {
+    return { ...token, error: 'RefreshAccessTokenError' };
+  }
+};
+
+// Authentication handlers
+const handleCredentialsSignIn = async (user: User) => {
+  const response = await axios.post(
+    `http://localhost:3001/api/v1/user/generate-tokens`,
+    {
+      userId: user.id,
+    },
+  );
+  if (response.data?.accessToken && response.data?.refreshToken) {
+    user.accessToken = response.data.accessToken;
+    user.refreshToken = response.data.refreshToken;
+    return true;
+  }
+  return false;
+};
+
+// Token refresh handler
+const handleTokenRefresh = async (token: JWT) => {
+  let updatedToken = { ...token };
+  const accessTokenExpired = token.accessToken
+    ? isTokenExpired(token.accessToken)
+    : true;
+
+  if (accessTokenExpired) {
+    const backendTokenData = await refreshBackendAccessToken(token);
+    updatedToken = { ...token, ...backendTokenData };
+  }
+
+  return updatedToken;
+};
+
+// NextAuth configuration
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
+      type: 'credentials',
       credentials: {
-        username: { label: 'Username', type: 'text' },
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { type: 'string', label: 'Email' },
+        password: { type: 'string', label: 'Password' },
       },
-
       async authorize(credentials) {
-        try {
-          const response = await loginUser(
-            credentials.username as string,
-            credentials.email as string,
-            credentials.password as string,
-          );
-          console.log('Login response:', response.data);
+        if (!credentials?.email || !credentials?.password) return null;
 
-          if (!response.data) return null;
-          return (await response.data) ?? null;
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            console.error(
-              'Login failed:',
-              error.response?.data || error.message,
-            );
-          } else {
-            console.error('Login failed:', (error as Error).message);
+        try {
+          const response = await axios.post(
+            `${process.env.BACKEND_URL}/user/login`,
+            {
+              email: credentials.email,
+              password: credentials.password,
+            },
+          );
+
+          if (response.data?.success && response.data?.data) {
+            const { user, accessToken, refreshToken } = response.data.data;
+
+            return {
+              id: user._id,
+              username: user.username,
+              email: user.email,
+              accessToken,
+              refreshToken,
+              provider: 'credentials',
+              token: accessToken,
+            };
           }
+          return null;
+        } catch (error) {
+          console.log('error in credentials authorize function', error);
           return null;
         }
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.user = user;
+    async signIn({ user, account }) {
+      try {
+        if (account?.provider === 'credentials' && user.token) {
+          return await handleCredentialsSignIn(user);
+        }
+        return false;
+      } catch (error) {
+        console.error('Error during sign-in callback:', error);
+        return false;
       }
-      return token;
     },
+
+    async jwt({ token, user, account }) {
+      if (user && account) {
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
+        token.provider = account.provider;
+        token.user = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+        };
+        return token;
+      }
+
+      return handleTokenRefresh(token);
+    },
+
     async session({ session, token }) {
-      session.user = token.user as AdapterUser & {
-        id?: string;
-        username?: string;
-        email: string;
-      } & User;
+      session.accessToken = token.accessToken;
+      session.refreshToken = token.refreshToken;
+      session.provider = token.provider;
+      session.user = {
+        ...token.user,
+        id: token.user.id ?? '',
+        username: token.user.username,
+        email: token.user.email ?? '',
+        emailVerified: new Date(),
+        token: token.accessToken ?? '',
+      };
       return session;
     },
   },
   pages: {
     signIn: '/signin',
+  },
+  session: {
+    strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
 });

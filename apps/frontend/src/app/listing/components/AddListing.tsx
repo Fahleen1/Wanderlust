@@ -47,7 +47,7 @@ export default function AddListing() {
     onSuccess: () => {
       toast.success('Listing added successfully');
       form.reset();
-      router.push('/');
+      router.push('/listing');
     },
     onError: (error: { message: string }) => {
       toast.error(error.message);

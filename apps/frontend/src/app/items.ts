@@ -1,7 +1,7 @@
 export const links = [
   {
     title: 'Home',
-    url: '/',
+    url: '/listing',
   },
   {
     title: 'Add new Listing',

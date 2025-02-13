@@ -27,7 +27,7 @@ export default function EditListing({ id }: { id: string }) {
   const mutation = useMutation({
     mutationFn: (data: z.infer<typeof listingSchema>) => editListing(id, data),
     onSuccess: () => {
-      router.push('/');
+      router.push('/listing');
     },
     onError: (err: { message: string }) => {
       console.error('Update failed:', err);

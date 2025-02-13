@@ -46,11 +46,11 @@ export default function Listing({ id }: { id: string }) {
 
   const handleDelete = async (id: string) => {
     await deleteListing(id);
-    router.push('/');
+    router.push('/listing');
   };
 
   return (
-    <section className="min-h-screen w-full flex items-center justify-center p-4">
+    <section className="min-h-screen lg:w-full flex items-center justify-center p-4">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="flex flex-col lg:flex-row">
           {/* Image Section */}

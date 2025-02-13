@@ -17,6 +17,7 @@ export const addListings = async (
   price: number,
   location: string,
   country: string,
+  user: string,
 ) => {
   const newListing = Listings.create({
     title: title,
@@ -27,6 +28,7 @@ export const addListings = async (
     price: price,
     location: location,
     country: country,
+    user: user,
   });
 
   return newListing;

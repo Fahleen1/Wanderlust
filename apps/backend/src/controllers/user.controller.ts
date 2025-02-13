@@ -14,6 +14,10 @@ export const generateAccessAndRefreshToken = async (userId: string) => {
     const user = await getUserById(userId);
     const accessToken = user?.generateAccessToken();
     const refreshToken = user?.generateRefreshToken();
+
+    if (user) {
+      user.refreshToken = refreshToken;
+    }
     user?.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
@@ -169,6 +173,10 @@ export const refreshAccessToken = async (
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
       user._id,
     );
+
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
     return res
       .status(200)
       .cookie('accessToken', accessToken, options)
@@ -196,11 +204,13 @@ export const generateAuthTokens = async (
       throw new ApiError(400, 'User ID is required');
     }
     const user = await getUserById(userId);
+
     if (!user) {
       throw new ApiError(404, 'User not found');
     }
-    const accessToken = await userId.generateAccessToken(userId);
-    const refreshToken = await userId.generateRefreshToken(userId);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
     res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
     next(error);

@@ -5,6 +5,7 @@ import {
   getAllListings,
   getListingById,
 } from '../services/listings.service';
+import { ApiError } from '../utils/ApiError';
 import ApiResponse from '../utils/ApiResponse';
 import { NextFunction, Request, Response } from 'express';
 
@@ -50,6 +51,11 @@ export const addListing = async (
     const price = req.body.price;
     const location = req.body.location;
     const country = req.body.country;
+    const user = req.user._id;
+    console.log(user);
+    if (!user || !user._id) {
+      throw new ApiError(401, 'Unauthorized: User not logged in');
+    }
     const listing = await addListings(
       title,
       desc,
@@ -57,6 +63,7 @@ export const addListing = async (
       price,
       location,
       country,
+      user,
     );
     res.status(200).json(listing);
   } catch (err) {
@@ -108,6 +115,32 @@ export const removeListing = async (
     return res
       .status(200)
       .json(new ApiResponse(200, {}, 'Listing deleted successfully'));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkListingOwner = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const listingId = req.params.id;
+    const userId = req.user._id;
+
+    const listing = await getListingById(listingId);
+    if (!listing) throw new ApiError(404, 'Listing not found');
+
+    // Check if the logged-in user is the owner
+    if (listing.user.toString() !== userId.toString()) {
+      throw new ApiError(
+        403,
+        'You are not authorized to edit/delete this listing',
+      );
+    }
+
+    next();
   } catch (error) {
     next(error);
   }
